@@ -364,7 +364,9 @@ class WebSocket(object):
         try:
             message = self._encode_bytes(message)
 
-            self.send_frame(message, opcode=self.OPCODE_CLOSE)
+            # https://gitlab.com/noppo/gevent-websocket/commit/3e5d6353faea382b44ac7209402da4fe308e6e8b#2366883b96723a47ded37f4fec17f07591e69d47_363_366
+            self.send_frame(struct.pack('!H%ds' % len(message), code, message),
+                            opcode=self.OPCODE_CLOSE)
         except WebSocketError:
             # Failed to write the closing frame but it's ok because we're
             # closing the socket anyway.
